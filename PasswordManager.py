@@ -19,8 +19,7 @@ class PasswordManager:
         num_lower = length - (num_sc + num_num + num_upper)
         return [num_sc, num_num, num_upper, num_lower]
 
-    def __password_gen(self, criteria=None, length=14, spec_char="@!&", repeat=True, min_spec=0, max_spec=0, min_num=0,
-                       min_upper=0):
+    def __password_gen(self, criteria=None, length=14, spec_char="@!&", repeat=True, min_spec=0, max_spec=0, min_num=0, min_upper=0):
         if criteria is not None:
             return self.__password_gen(length=criteria.get("length", length),
                                        spec_char=criteria.get("spec_char", spec_char),
