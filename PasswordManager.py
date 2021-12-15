@@ -1,13 +1,13 @@
-import random
 import string
-from random import randint, shuffle
+from random import randint, shuffle, choices, sample
 import pandas as pd
 
 
 class PasswordManager:
 
     def __init__(self, name, master_pw):
-        self.__passwords = pd.DataFrame(columns=["Username", "Password"])
+        self.__passwords = pd.DataFrame(columns=["Site", "Username", "Password"])
+        self.__passwords.set_index("Site", inplace=True)
         self.__name = name
         self.__master_pw = master_pw
 
@@ -34,20 +34,19 @@ class PasswordManager:
         if required <= length and (repeat or len(spec_char) >= min_spec):
             specs = self.__password_specs(length, min_spec, max_spec, min_num, min_upper)
             if repeat:
-                password = random.choices(string.ascii_lowercase, k=specs[3]) + random.choices(string.ascii_uppercase, k=specs[2]) + random.choices(string.digits, k=specs[1]) + random.choices(spec_char, k=specs[0])
+                password = choices(string.ascii_lowercase, k=specs[3]) + choices(string.ascii_uppercase, k=specs[2]) + choices(string.digits, k=specs[1]) + choices(spec_char, k=specs[0])
             else:
                 while specs[0] > len(spec_char) or specs[1] > len(string.digits) or specs[2] > len(string.ascii_uppercase) or specs[3] > len(string.ascii_lowercase):
                     specs = self.__password_specs(length, min_spec, max_spec, min_num, min_upper)
-                password = random.sample(string.ascii_lowercase, k=specs[3]) + random.sample(string.ascii_uppercase, k=specs[2]) + random.sample(string.digits, k=specs[1]) + random.sample(spec_char, k=specs[0])
+                password = sample(string.ascii_lowercase, k=specs[3]) + sample(string.ascii_uppercase, k=specs[2]) + sample(string.digits, k=specs[1]) + sample(spec_char, k=specs[0])
             shuffle(password)
             return "".join(password)
 
     def add_password(self, site, username, criteria=None):
-        if site not in self.__passwords.index:
-            if (password := self.__password_gen(criteria)) is not None:
-                self.__passwords = self.__passwords.append(pd.DataFrame([[username, password]], columns=["Username", "Password"], index=[site]))
-            else:
-                print("Invalid specifications.")
+        if (password := self.__password_gen(criteria)) is None:
+            print("Invalid specifications.")
+        elif site not in self.__passwords.index:
+            self.__passwords.loc[site] = username, password
 
     def validate(self, mp):
         return mp == self.__master_pw
