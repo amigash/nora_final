@@ -53,7 +53,7 @@ class PasswordManager:
         return mp == self.__master_pw
 
     def change_password(self, site, master_pass, new_pass=None, criteria=None):
-        if master_pass != self.__master_pw:
+        if not self.validate(master_pass):
             print("Incorrect password.")
             return False
         if site not in self.__passwords.index:
